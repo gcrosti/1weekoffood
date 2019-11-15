@@ -7,3 +7,6 @@ MarkupSafe==1.0
 pytz==2017.2
 requests>=2.20.0
 Werkzeug>=0.15.3
+pandas>=0.25.3
+numpy>=1.17.4
+cython>=0.27
