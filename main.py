@@ -13,18 +13,12 @@ def index():
         {'name':'Quebec'}])
 @app.route("/result" , methods=['GET', 'POST'])
 def result():
-    data = []
     error = None
     select = request.form.get('comp_select')
-    resp = query_api(select)
-    pp(resp)
-    if resp:
-       data.append(resp)
-    if len(data) != 2:
-        error = 'Bad Response from Weather API'
+    data = query_api(select)
     return render_template(
         'result.html',
-        data=data,
-        error=error)
+        tables=data,
+        error=error,titles=['test1','test2'])
 if __name__=='__main__':
     app.run(debug=True)
