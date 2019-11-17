@@ -10,6 +10,8 @@ scope = ['https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis
 creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/giuseppecrosti/Documents/1weekoffood/client_secret.json', scope)
 client = gspread.authorize(creds)
 
+#%%
+print([0]*4)
 #%% OPEN WORKSHEETS
 worksheet = client.open("1week of food calculator")
 worksheet_data = client.open("Data_1weekMVP")

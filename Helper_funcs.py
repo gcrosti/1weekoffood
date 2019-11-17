@@ -1,9 +1,10 @@
 
 
-from itertools import combinations_with_replacement
+from itertools import combinations_with_replacement, islice
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
+import numpy as np
 
 
 # CREATE CLIENT
@@ -32,19 +33,28 @@ def generate_meals(inputs):
     meals1 = gf_filter(meals,inputs['s_gf'])
     meals2 = veg_filter(meals1,inputs['s_veg'])
     total_portions = int(7 * (int(inputs['s_lunch_p'][:len(inputs['s_lunch_p'])-1])/100) + 7 * (int(inputs['s_dinner_p'][:len(inputs['s_dinner_p'])-1])/100)) * int(inputs['s_mouths'])
-    meal_combos = list(combinations_with_replacement(meals2['id'],total_portions))
-    #meal_combos2 = [x for x in meal_combos if len(set(x)) > 2]
-    #for combo in meal_combos:
-        # if len(set(combo)) < 3:
-        #     continue
-        # set_combo = set(combo)
-        # count = 0
-        # for meal in set_combo:
-        #     if int(combo.count(meal)) % int(meals2[meals2['id']==meal]['max_min_portion']) > 1:
-        #         break
-        #     count += 1
-        #     if count == len(set_combo):
-        #         meal_combos2.append(combo)
-        #         count = 0
-    return meal_combos
+    meal_combos = (combinations_with_replacement(meals2['id'],total_portions))
+    meal_combos2 = (x for x in meal_combos if len(set(x)) > 2)
+    varied_combos = {}
+    min_var = 0
+    for combo in meal_combos2:
+        set_combo = set(combo)
+        count = 0
+        for meal in set_combo:
+            if int(combo.count(meal)) % int(meals2[meals2['id']==meal]['max_min_portion']) > 1:
+                break
+            count += 1
+            if count == len(set_combo):
+                count = 0
+                if len(varied_combos) < 10:
+                    varied_combos[np.var(combo)] = combo
+                    min_var = min(varied_combos.keys())
+                    break
+                if min_var < np.var(combo):
+                    varied_combos[np.var(combo)] = combo
+                    del varied_combos[min_var]
+                    min_var = min(varied_combos.keys())
+                
+
+    return varied_combos.values()
 
