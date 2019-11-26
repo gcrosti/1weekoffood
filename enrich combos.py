@@ -16,6 +16,7 @@ worksheet_data = client.open("Data_1weekMVP")
 
 #%% OPEN PICKLED COMBOS
 combos = pd.read_pickle('/Users/giuseppecrosti/Documents/1weekoffood/all_combos.pkl')
+combos.head()
 
 #%% OPEN TABLES
 meals = pd.DataFrame(worksheet_data.get_worksheet(6).get_all_records())
@@ -26,7 +27,7 @@ meals = pd.DataFrame(worksheet_data.get_worksheet(6).get_all_records())
 def gf_filter(combo):
     ans = 'y'
     for meal in set(combo):
-        if meals[meals['id']==meal]['Gluten-free?']=='n':
+        if str(meals[meals['id']==meal]['Gluten-free?'])=='n':
             ans = 'n'
             break
     return ans
@@ -35,7 +36,7 @@ def gf_filter(combo):
 def veg_filter(combo):
     ans = 'y'
     for meal in set(combo):
-        if meals[meals['id']==meal]['Vegetarian?']=='n':
+        if str(meals[meals['id']==meal]['Vegetarian?']) =='n':
             ans = 'n'
             break
     return ans
@@ -46,17 +47,46 @@ def enter_time(combo):
     time['active'] = 0
     time['passive'] = 0
     for meal in set(combo):
-        time['active'] += meals[meals['id']==meal]['total_active_time'] 
-        #time['passive'] = max([meals[meals['id']==meal]['max_passive_time'],time['passive']])
+        time['active'] += int(meals[meals['id']==meal]['total_active_time']) 
+        time['passive'] = max([int(meals[meals['id']==meal]['max_passive_time']),time['passive']])
     return time
 
 #%% ENRICH COMBOS
-combos['active_time'] = [enter_time(x)['active'] for x in combos['combo']]
-#combos['passive_time'] = [enter_time(x)['passive'] for x in combos['combo']]
-combos['veg'] = [veg_filter(x) for x in combos['combo']]
-combos['gf'] = [gf_filter(x) for x in combos['combo']]
+active_time = []
+passive_time = []
+veg = []
+gf = []
+for combo in combos['combo']:
+    if not combo:
+        continue
+    t = enter_time(combo)
+    active_time.append(t['active'])
+    passive_time.append(t['passive'])
+    veg.append(veg_filter(combo))
+    gf.append(gf_filter(combo))
+#%%
+active_time = []
+for combo in combos['combo']:
+    active_time.append(enter_time(combo)['active'])
+
+active_time
+#%%
+combos['active_time'] = active_time
+#combos['passive_time'] = passive_time
+#combos['veg'] = veg
+#combos['gf'] = gf
+combos.head()
+
+
+#%%
+combos.to_pickle('combos_enriched.pkl')
+#%%
+combos_enriched_pkl = pd.read_pickle('/Users/giuseppecrosti/Documents/1weekoffood/combos_enriched.pkl')
+combos_enriched_pkl.head()
 
 
 
+#%%
+combos_enriched_pkl[combos_enriched_pkl['gf']=='n'].head()
 
 #%%

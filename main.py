@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 from pprint import pprint as pp
 from flask import Flask, flash, redirect, render_template, request, url_for
-from ingredients import query_api
-from Helper_funcs import generate_meals
+from output_generator import output
 
 app = Flask(__name__)
 @app.route('/')
@@ -19,7 +18,7 @@ def result():
     inputs['s_dinner_p'] = request.form.get('dinner_p')
     inputs['s_veg'] = request.form.get('veg')
     inputs['s_gf'] = request.form.get('gf')
-    data = generate_meals(inputs)
+    data = output(inputs)
     return render_template(
         'result.html',
         tables=data,
