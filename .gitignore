@@ -1,2 +1,11 @@
+#ignore client secret
 *client_secret.json
-*venv
+
+#ignore virtual env
+venv/
+
+#ignore gcloud sdk
+google-cloud-sdk/
+
+#ignore pickled database
+*.pkl

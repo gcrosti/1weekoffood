@@ -1,11 +1,7 @@
 <!doctype html>
-<title>Simple tables</title>
+<title>Here is an option</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
-  <h1>Surfer groups</h1>
+  <h1>Results</h1>
   {{ tables.to_html() | safe}}
-  {% for table in tables %}
-    <h2>{{titles[loop.index]}}</h2>
-    {{ table|safe }}
-  {% endfor %}
 </div>
