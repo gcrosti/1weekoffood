@@ -9,3 +9,11 @@ google-cloud-sdk/
 
 #ignore pickled database
 *.pkl
+
+#ignore lib
+lib/
+
+
+#source '/Users/giuseppecrosti/Documents/1weekoffood/google-cloud-sdk/path.bash.inc'
+#source '/Users/giuseppecrosti/Documents/1weekoffood/google-cloud-sdk/completion.bash.inc'
+

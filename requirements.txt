@@ -10,3 +10,4 @@ Werkzeug>=0.15.3
 pandas>=0.25.3
 numpy>=1.17.4
 cython>=0.27
+gspread>=3.1
