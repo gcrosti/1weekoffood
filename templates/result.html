@@ -3,5 +3,7 @@
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
   <h1>Results</h1>
-  {{ tables.to_html() | safe}}
+  {% for option in tables %}
+    <p>{{option}}</p>
+  {% endfor %}
 </div>
