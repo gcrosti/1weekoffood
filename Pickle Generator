@@ -15,13 +15,13 @@ meals = worksheet_data.get_worksheet(6).get_all_records()
 meals_recipes = worksheet_data.get_worksheet(4).get_all_records()
 recipes = worksheet_data.get_worksheet(0).get_all_records()
 with open('meals.pickle','wb') as f:
-    pickle.dump(meals,f,pickle.HIGHEST_PROTOCOL)
+    pickle.dump(meals,f,protocol=2)
 
 with open('meals_recipes.pickle','wb') as f:
-    pickle.dump(meals_recipes,f,pickle.HIGHEST_PROTOCOL)
+    pickle.dump(meals_recipes,f,protocol=2)
 
 with open('recipes.pickle','wb') as f:
-    pickle.dump(recipes,f,pickle.HIGHEST_PROTOCOL)
+    pickle.dump(recipes,f,protocol=2)
 #%% TRANSPOSE ENRICHED COMBOS TO LIST OF DICTS
 with open('combos_enriched.pkl','rb') as f:
     combos_enriched = pickle.load(f)
@@ -32,5 +32,5 @@ ce_list = combos_enriched.to_dict('records')
 len(ce_list)
 #%% PICKLE NEW ENRICHED COMBO LIST
 with open('enriched_combos_l.pickle','wb') as f:
-    pickle.dump(ce_list,f,pickle.HIGHEST_PROTOCOL)
+    pickle.dump(ce_list,f,protocol=2)
 #%%
