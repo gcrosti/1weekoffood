@@ -31,14 +31,13 @@ for percentage in percentages:
 #%% GENERATE FILTER FOR LEFTOVERS
 def checkforleftovers(combo):
     set_combo = set(combo)
-    count = 0
     for meal in set_combo:
-        if int(combo.count(meal)) % int(meals[meals['id']==meal]['max_min_portion']) > 1:
-            break
-        count += 1
-        if count == len(set_combo):
-            return True
-    return False
+        l = int(combo.count(meal)) / int(meals[meals['id']==meal]['max_min_portion'])
+        if abs(l-round(l)) > 0.3:
+            print(abs(l-round(l)))
+            return False       
+    return True
+    
 
 #%% GENERATE COMBOS DF
 meal_combos_df = pd.DataFrame(columns=('portion','combo'))
@@ -67,3 +66,4 @@ def extract_active_time(l):
     for meal in l:
         total += int(meals[meals['id'] == meal]['total_active_time'])
     return total
+#%%

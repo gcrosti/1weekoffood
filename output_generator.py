@@ -29,6 +29,7 @@ def format_inputs(x):
     print(r)
     return r
 
+# GENERATE VIABLE OUTPUTS
 def output(inputs):
     f_inputs = format_inputs(inputs)
     possible_combos = []
@@ -41,14 +42,8 @@ def output(inputs):
                 continue
         if row['portion'] == f_inputs['mouths']:
             possible_combos.append(row) 
-    
-    #sample = random.sample(possible_combos,10)
+        
     out = possible_combos
-    #out['meal_id'] = [x for x in set(sample['combo'][0])]
-    #out['meal_name'] = [meals[meals['id']==x]['Meal_name'].values[0] for x in out['meal_id']]
-    #out['recipes'] = [meals_recipes[meals_recipes['Meal_id']==x]['Recipe_name'].values for x in out['meal_id']]
-    #out['recipe_urls'] = [meals_recipes[meals_recipes['Meal_id']==x]['recipe_urls'].values for x in out['meal_id']]
-    #out['servings'] = [sample['combo'].values[0].count(x) for x in out['meal_id']]
     return out
     
 
