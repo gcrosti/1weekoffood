@@ -1,13 +1,13 @@
 #%% IMPORT LIBRARIES
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import pandas as pd
 from itertools import combinations_with_replacement
-import numpy as np
+import numpy as np 
+from collections import Counter
 
 #%% CREATE CLIENT
 scope = ['https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/giuseppecrosti/Documents/1weekoffood/client_secret.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/giuseppecrosti/weekoffood/1weekoffood/client_secret.json', scope)
 client = gspread.authorize(creds)
 
 #%% OPEN WORKSHEETS
@@ -15,55 +15,61 @@ worksheet = client.open("1week of food calculator")
 worksheet_data = client.open("Data_1weekMVP")
 
 #%% CREATE TABLES
-meals = pd.DataFrame(worksheet_data.get_worksheet(6).get_all_records())
-meals_recipes = pd.DataFrame(worksheet_data.get_worksheet(4).get_all_records())
-recipes = pd.DataFrame(worksheet_data.get_worksheet(0).get_all_records())
+meals = worksheet_data.get_worksheet(6).get_all_records()
+meals_recipes = worksheet_data.get_worksheet(4).get_all_records()
+recipes = worksheet_data.get_worksheet(0).get_all_records()
 
-#%% GENERATE ALL MEAL COMBOS
-percentages = [0.25,0.5,0.75,1,1.25,1.5,1.75,2]
-mouths = [1,2,3,4,5]
+
+#%% GENERATE ALL MEAL COMBO ITERATORS
+percentages = [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,2.5,2.75,3]
 all_combos = {}
 for percentage in percentages:
-    for mouth in mouths:
-        portion = 7*percentage*mouth
-        all_combos[portion] = combinations_with_replacement(meals['id'],int(portion))
+    portion = 7*percentage
+    all_combos[portion] = combinations_with_replacement([x['id'] for x in meals],int(portion))
+
+#%%
+all_combos
+#%%GENERATE DICS OF ID-MAXMINPORTIONS
+portiondict = {}
+for meal in meals:
+    portiondict[meal['id']] = meal['max_min_portion']
 
 #%% GENERATE FILTER FOR LEFTOVERS
-def checkforleftovers(combo):
+def toomanyleftovers(combo):
     set_combo = set(combo)
+    if len(set_combo) > 4:
+        return True
+    c = Counter(combo)
     for meal in set_combo:
-        l = int(combo.count(meal)) / int(meals[meals['id']==meal]['max_min_portion'])
-        if abs(l-round(l)) > 0.3:
-            print(abs(l-round(l)))
-            return False       
-    return True
-    
-
-#%% GENERATE COMBOS DF
-meal_combos_df = pd.DataFrame(columns=('portion','combo'))
+        left = abs(int(c[meal]) - int(portiondict[meal]))
+        if left > 1:
+            return True       
+    return False
+#%% GENERATE COMBOS
+meal_combos = {}
 for portion in all_combos:
     print(portion)
-    len_set = 0
+    meal_combos[portion] = []
     for combo in all_combos[portion]:
         if not combo:
+           continue
+        if toomanyleftovers(combo):
             continue
-        if not checkforleftovers(combo):
-            continue
-        if len(set(combo)) <= len_set:
-            continue
-        meal_combos_df = meal_combos_df.append({'portion':portion,'combo':combo},ignore_index=True)
-        len_set = min([3,len(set(combo))])
-        if len(meal_combos_df[meal_combos_df['portion']==portion]['portion']) == 1000:
+        meal_combos[portion].append(combo)
+        if len(meal_combos[portion]) > 20:
             break
 
-meal_combos_df.head()
+#%%
+meal_combos
 #%% PICKLE COMBOS
-meal_combos_df.to_pickle('all_combos.pkl')
+#meal_combos_df.to_pickle('all_combos.pkl')
 #%%
- 
-def extract_active_time(l):
-    total = 0
-    for meal in l:
-        total += int(meals[meals['id'] == meal]['total_active_time'])
-    return total
-#%%
+
+#%% CREATE ARRAYS
+columns = []
+dts = []
+for k in meals[0].keys():
+    dts.append((k,type(meals[0][k])))
+    columns.append(tuple([meal[k] for meal in meals]))
+#print(dts)
+meals_arr = np.array(columns,dtype=dts)
