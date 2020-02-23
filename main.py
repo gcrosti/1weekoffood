@@ -21,7 +21,7 @@ def result():
     data = output(inputs)
     return render_template(
         'result.html',
-        tables=data,
+        options=zip(data,range(1,len(data))),
         error=error,titles=['test1','test2'])
 if __name__=='__main__':
     app.run(debug=True)

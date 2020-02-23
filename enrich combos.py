@@ -71,13 +71,20 @@ for elem in meals_recipes:
     meal_recipe_dict[elem['Meal_id']].append(elem)
 
 #print(meal_recipe_dict[1])
-    
-#%% ADD RECIPE DATA
+
+#%% CREATE MEALNAME DICT
+mealnames = {}
+for meal in meals:
+    mealnames[meal['id']] = meal['Meal_name']
+
+#%% ADD RECIPE DATA AND MEAL MULTIPLIER
 for combo_dict in enriched_combos:
     setcombo = set(combo_dict['combo'])
     c = Counter(combo_dict['combo'])
     combo_recipes = []
+    meal_multipliers = {}
     for meal_id in setcombo:
+        meal_multipliers[mealnames[meal_id]] = c[meal_id]
         meal_recipes = meal_recipe_dict[meal_id]
         for r in meal_recipes:
             recipe = {}
@@ -92,9 +99,7 @@ for combo_dict in enriched_combos:
             recipe['multiplier'] = round(c[meal_id]/r['min_portion'],1)
             combo_recipes.append(recipe)
     combo_dict['recipes'] = combo_recipes
-
-
-#enriched_combos[100]['recipes']
+    combo_dict['meal_multipliers'] = meal_multipliers
 
 #%% REFACTOR INGREDIENT DATA
 recipe_ingredient_dict = {}
@@ -104,7 +109,7 @@ for recipe_id in set(x['recipe_Id'] for x in recipes_ingredients):
 for elem in recipes_ingredients:
     recipe_ingredient_dict[elem['recipe_Id']].append(elem)
 
-print(recipe_ingredient_dict[1])
+#print(recipe_ingredient_dict[1])
 
 #%% ADD INGREDIENT DATA
 for combo_dict in enriched_combos:
@@ -123,7 +128,7 @@ for combo_dict in enriched_combos:
                 combo_ingredients[ingredient['ingredient_id']]['amount'] += ingredient['amount ']*recipe['multiplier']
     combo_dict['ingredients'] = combo_ingredients
 
-enriched_combos[32]['ingredients']
+#enriched_combos[32]['ingredients']
 
 #%% PICKLE
 

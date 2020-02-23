@@ -1,3 +1,4 @@
+from __future__ import division
 from datetime import datetime
 import os
 import pytz
@@ -5,6 +6,7 @@ import requests
 import math
 import pickle
 import random
+
 
 # OPEN ENRICHED COMBOS
 with open('enriched_combos_l.pickle','rb') as f:
@@ -43,8 +45,11 @@ def output(inputs):
         if row['portion'] == f_inputs['mouths']:
             possible_combos.append(row) 
         
-    out = {}
-    return out
+    sorted_combos = sorted(possible_combos, key = lambda i: i['total_active_time'])
+    if sorted_combos:
+        out = [sorted_combos[0],sorted_combos[int(round(len(sorted_combos)/2))],sorted_combos[-1]]
+        return out
+    return "no combos available :("
     
 
 

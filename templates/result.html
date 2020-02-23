@@ -2,8 +2,21 @@
 <title>Here is an option</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
-  <h1>Results</h1>
-  {% for option in tables %}
-    <p>{{option}}</p>
+  <h1>Here are your options, from fastest to slowest</h1>
+  {% for combo,index in options %}
+    <h2>Option {{index}}</h2>
+    <p>Active Time: {{combo['total_active_time']}} minutes. Passive Time: {{combo['max_passive_time']}} minutes</p>
+    <h3>Meals:</h3>
+    {% for mealname,amt in combo['meal_multipliers'].items() %}
+      <p>{{amt}} servings of {{mealname}}.</p>
+    {% endfor %}
+    <h3>Recipes:</h3>
+    {% for recipe in combo['recipes'] %}
+      <p>{{recipe['recipe_name']}} - multiply this recipe by {{recipe['multiplier']}}. <a href={{recipe['recipe_url']}} target="_blank">Instructions here</a></p>
+    {% endfor %}
+    <h3>Ingredients:</h3>
+    {% for ingredient in combo['ingredients'].values() %}
+      <p>{{ingredient['amount']}} {{ingredient['units']}} of {{ingredient['name']}}</p>
+    {% endfor %}
   {% endfor %}
 </div>
