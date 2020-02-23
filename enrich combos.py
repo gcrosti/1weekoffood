@@ -19,12 +19,13 @@ with open('recipes.pickle','rb') as f:
     recipes = pickle.load(f)
 with open('all_combos.pickle','rb') as f:
     all_combos = pickle.load(f)
+with open('recipes_ingredients.pickle','rb') as f:
+    recipes_ingredients = pickle.load(f)
+
 
 #%%
 #print(meals)
-#%% HELPER FUNCS
-
-#REFACTORING DATA
+#%% REFACTORING GF, VEG, TIME DATA
 gf_mealids = []
 veg_mealids = []
 timedict = {}
@@ -35,34 +36,6 @@ for meal in meals:
     if meal['Vegetarian?'] == 'y':
         veg_mealids.append(aidee)
     timedict[aidee] = [meal['total_active_time'],meal['max_passive_time']]
-
-
-#GLUTEN-FREE FILTER
-def is_gf(combo):
-    for meal in set(combo):
-        if meal in gf_mealids:
-            return 'y'      
-    return 'n'
-
-#VEGETARIAN FILTER
-def is_veg(combo):
-    for meal in set(combo):
-        if meal in veg_mealids:
-            return 'y'
-    return 'n'
-
-#print(timedict)
-#%%
-#TIME CALCULATION
-
-def enter_time(combo):
-    time = {}
-    time['active'] = 0
-    time['passive'] = 0
-    for meal in set(combo):
-        time['active'] += int(meals[meals['id']==meal]['total_active_time']) 
-        time['passive'] = max([int(meals[meals['id']==meal]['max_passive_time']),time['passive']])
-    return time
 
 #%% ADD GF, VEG, ACTIVE TIME, PASSIVE TIME
 enriched_combos = []
@@ -85,11 +58,11 @@ for portion, combos in all_combos.items():
         combo_dict['max_passive_time'] = max(timedict[x][1] for x in comboset)
         enriched_combos.append(combo_dict)
 
-enriched_combos[100]
+#enriched_combos[100]
 #%%
 #len(enriched_combos)
 
-#%%
+#%% REFACTOR RECIPE DATA
 meal_recipe_dict = {}
 for meal_id in set(x['Meal_id'] for x in meals_recipes):
     meal_recipe_dict[meal_id] = []
@@ -97,9 +70,9 @@ for meal_id in set(x['Meal_id'] for x in meals_recipes):
 for elem in meals_recipes:
     meal_recipe_dict[elem['Meal_id']].append(elem)
 
-print(meal_recipe_dict[1])
+#print(meal_recipe_dict[1])
     
-#%% ADD RECIPES AND INGREDIENTS
+#%% ADD RECIPE DATA
 for combo_dict in enriched_combos:
     setcombo = set(combo_dict['combo'])
     c = Counter(combo_dict['combo'])
@@ -121,8 +94,39 @@ for combo_dict in enriched_combos:
     combo_dict['recipes'] = combo_recipes
 
 
-enriched_combos[100]['recipes']
-#%%
+#enriched_combos[100]['recipes']
+
+#%% REFACTOR INGREDIENT DATA
+recipe_ingredient_dict = {}
+for recipe_id in set(x['recipe_Id'] for x in recipes_ingredients):
+    recipe_ingredient_dict[recipe_id] = []
+
+for elem in recipes_ingredients:
+    recipe_ingredient_dict[elem['recipe_Id']].append(elem)
+
+print(recipe_ingredient_dict[1])
+
+#%% ADD INGREDIENT DATA
+for combo_dict in enriched_combos:
+    setcombo = set(combo_dict['combo'])
+    combo_ingredients = {}
+    for recipe in combo_dict['recipes']:
+        for ingredient in recipe_ingredient_dict[recipe['recipe_id']]:
+            if ingredient['ingredient_id'] not in combo_ingredients.keys():
+                combo_ingredients[ingredient['ingredient_id']] = {}
+                combo_ingredients[ingredient['ingredient_id']]['amount'] = ingredient['amount ']*recipe['multiplier']
+                combo_ingredients[ingredient['ingredient_id']]['units'] = ingredient['units']
+                combo_ingredients[ingredient['ingredient_id']]['required?'] = ingredient['required?']
+                combo_ingredients[ingredient['ingredient_id']]['name'] = ingredient['ingredient_name']
+                combo_ingredients[ingredient['ingredient_id']]['recipe_name'] = ingredient['recipe_title']
+            else:
+                combo_ingredients[ingredient['ingredient_id']]['amount'] += ingredient['amount ']*recipe['multiplier']
+    combo_dict['ingredients'] = combo_ingredients
+
+enriched_combos[32]['ingredients']
+
+#%% PICKLE
+
 with open('enriched_combos_l.pickle','wb') as f:
     pickle.dump(enriched_combos,f,protocol=2)
 
