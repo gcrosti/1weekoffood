@@ -6,6 +6,9 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import numpy as np
 import pickle
+from collections import Counter
+from __future__ import division
+
 
 #%%OPEN DATA
 with open('meals.pickle','rb') as f:
@@ -48,7 +51,7 @@ def is_veg(combo):
             return 'y'
     return 'n'
 
-print(timedict)
+#print(timedict)
 #%%
 #TIME CALCULATION
 
@@ -61,7 +64,7 @@ def enter_time(combo):
         time['passive'] = max([int(meals[meals['id']==meal]['max_passive_time']),time['passive']])
     return time
 
-#%% ENRICH COMBOS
+#%% ADD GF, VEG, ACTIVE TIME, PASSIVE TIME
 enriched_combos = []
 for portion, combos in all_combos.items():
     for combo in combos:
@@ -71,7 +74,7 @@ for portion, combos in all_combos.items():
         comboset = set(combo)
         if all(item in veg_mealids for item in comboset):
             combo_dict['veg'] = 'y'
-            print(combo_dict)
+            #print(combo_dict)
         else:
             combo_dict['veg'] = 'n'
         if all(item in gf_mealids for item in comboset):
@@ -84,8 +87,41 @@ for portion, combos in all_combos.items():
 
 enriched_combos[100]
 #%%
-len(enriched_combos)
+#len(enriched_combos)
 
+#%%
+meal_recipe_dict = {}
+for meal_id in set(x['Meal_id'] for x in meals_recipes):
+    meal_recipe_dict[meal_id] = []
+
+for elem in meals_recipes:
+    meal_recipe_dict[elem['Meal_id']].append(elem)
+
+print(meal_recipe_dict[1])
+    
+#%% ADD RECIPES AND INGREDIENTS
+for combo_dict in enriched_combos:
+    setcombo = set(combo_dict['combo'])
+    c = Counter(combo_dict['combo'])
+    combo_recipes = []
+    for meal_id in setcombo:
+        meal_recipes = meal_recipe_dict[meal_id]
+        for r in meal_recipes:
+            recipe = {}
+            recipe['active_time'] = r['active_time']
+            recipe['min_portion'] = r['min_portion']
+            recipe['passive_time'] = r['passive_time']
+            recipe['recipe_id'] = r['Recipe_id']
+            recipe['meal_id'] = meal_id
+            recipe['meal_name'] = r['Meal_name']
+            recipe['recipe_name'] = r['Recipe_name']
+            recipe['recipe_url'] = r['recipe_urls']
+            recipe['multiplier'] = round(c[meal_id]/r['min_portion'],1)
+            combo_recipes.append(recipe)
+    combo_dict['recipes'] = combo_recipes
+
+
+enriched_combos[100]['recipes']
 #%%
 with open('enriched_combos_l.pickle','wb') as f:
     pickle.dump(enriched_combos,f,protocol=2)

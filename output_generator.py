@@ -43,7 +43,7 @@ def output(inputs):
         if row['portion'] == f_inputs['mouths']:
             possible_combos.append(row) 
         
-    out = possible_combos
+    out = {}
     return out
     
 

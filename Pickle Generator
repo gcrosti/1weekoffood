@@ -5,7 +5,7 @@ import pickle
 
 #%% CREATE CLIENT
 scope = ['https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/giuseppecrosti/Documents/1weekoffood/client_secret.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name('/Users/giuseppecrosti/weekoffood/1weekoffood/client_secret.json', scope)
 client = gspread.authorize(creds)
 
 #%% OPEN WORKSHEET
@@ -22,15 +22,7 @@ with open('meals_recipes.pickle','wb') as f:
 
 with open('recipes.pickle','wb') as f:
     pickle.dump(recipes,f,protocol=2)
-#%% TRANSPOSE ENRICHED COMBOS TO LIST OF DICTS
-with open('combos_enriched.pkl','rb') as f:
-    combos_enriched = pickle.load(f)
 
-ce_list = combos_enriched.to_dict('records')
 
-#%%
-len(ce_list)
-#%% PICKLE NEW ENRICHED COMBO LIST
-with open('enriched_combos_l.pickle','wb') as f:
-    pickle.dump(ce_list,f,protocol=2)
-#%%
+
+# %%
