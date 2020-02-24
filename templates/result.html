@@ -2,6 +2,7 @@
 <title>Here is an option</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
+  {% if options %}
   <h1>Here are your options, from fastest to slowest</h1>
   {% for combo,index in options %}
     <h2>Option {{index}}</h2>
@@ -19,4 +20,7 @@
       <p>{{ingredient['amount']}} {{ingredient['units']}} of {{ingredient['name']}}</p>
     {% endfor %}
   {% endfor %}
+  {% else %}
+  <h2>Oops! Looks like we couldn't find any combos to match your criteria :(</h2>
+  {% endif %}
 </div>

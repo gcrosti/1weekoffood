@@ -49,7 +49,7 @@ def output(inputs):
     if sorted_combos:
         out = [sorted_combos[0],sorted_combos[int(round(len(sorted_combos)/2))],sorted_combos[-1]]
         return out
-    return "no combos available :("
+    return []
     
 
 
